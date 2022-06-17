@@ -1,0 +1,12 @@
+[Unit]
+Description=airbyte connection
+After=docker_boot.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/home/ec2-user/airbyte-connection-ctl
+ExecStart=/usr/bin/node ./src/index.js
+
+[Install]
+WantedBy=multi-user.target
