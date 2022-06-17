@@ -26,7 +26,6 @@ async function main() {
     console.log("Airbyte server is ready. Starting sync.")
     
     // Start manual sync
-    /*
     const sync = await axios
     .post(`${SERVER}/api/v1/connections/sync`, { connectionId: CONNECTION_ID })
     .catch(err => console.log(err.message))
@@ -45,7 +44,6 @@ async function main() {
         if (status?.data?.job?.status !== 'running') jobRunning = false
         await sleep(1000)    
     }
-    */
 
     // Set flag for root cron to stop server
     console.log("Sync finished. Shutting down.")
