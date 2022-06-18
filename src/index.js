@@ -1,16 +1,44 @@
 import axios from 'axios'
 import { exec } from 'child_process'
+import AWS from 'aws-sdk'
 import dotenv  from "dotenv"
-import { client, v1 } from '@datadog/datadog-api-client'
+import { v4 as uuidv4 } from 'uuid'
 
 dotenv.config()
-const configuration = client.createConfiguration()
-const apiInstance = new v1.EventsApi(configuration)
+
+
+// AWS setup
+AWS.config.update({region: 'us-west-2'});
+let cwlogs = new AWS.CloudWatchLogs({apiVersion: '2014-03-28'});
 
 
 const SERVER = 'http://localhost:8000'
 const CONNECTION_ID = '47393f4b-2d3e-452f-9d2a-f3e01e1240b2'
 
+
+async function sendEvent(payload) {
+    const logGroupName = '/aws/events/airbyteSyncService'
+    const logStreamName = uuidv4()
+
+    const streamParams = {
+        logGroupName: logGroupName,
+        logStreamName: logStreamName
+    }
+    await cwlogs.createLogStream(streamParams).promise()
+
+    const logParams = {
+        logEvents: [ 
+          {
+            message: JSON.stringify(payload),
+            timestamp: `${Date.now()}`
+          },
+        ],
+        logGroupName: logGroupName,
+        logStreamName: logStreamName
+    };
+    const res = await cwlogs.putLogEvents(logParams).promise()
+    console.log(res)
+}
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
@@ -22,8 +50,6 @@ function shutdown(callback){
 
 async function main() {
     let serverReady = false
-
-    console.log(`Test: ${process.env.DATADOG_KEY}`)
 
     while (!serverReady) {
         console.log(`Checking if Airbyte server is ready: ${Date.now()}`)
@@ -51,25 +77,9 @@ async function main() {
         .catch(err => console.log(err.message))
     
         if (status?.data?.job?.status !== 'running') {
-            console.log(status?.data?.attempts[0]?.attempt)
             jobRunning = false
-
-            const params = {
-                body: {
-                  title: "Airbyte Sync Ran Successfully",
-                  text: JSON.stringify(status?.data?.attempts[0]?.attempt),
-                },
-              }
-        
-            apiInstance
-            .createEvent(params)
-            .then((data) => {
-                console.log(
-                "API called successfully. Returned data: " + JSON.stringify(data)
-                );
-            })
-            .catch((error) => console.error(error))
-        
+            sendEvent(status?.data)
+            console.log(status?.data)
         }
         await sleep(1000)    
     }

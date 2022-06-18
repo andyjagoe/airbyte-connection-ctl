@@ -11,8 +11,9 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@datadog/datadog-api-client": "^1.0.0",
+    "aws-sdk": "^2.1157.0",
     "axios": "^0.27.2",
-    "dotenv": "^16.0.1"
+    "dotenv": "^16.0.1",
+    "uuid": "^8.3.2"
   }
 }
