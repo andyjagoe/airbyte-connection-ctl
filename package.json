@@ -11,6 +11,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.27.2"
+    "@datadog/datadog-api-client": "^1.0.0",
+    "axios": "^0.27.2",
+    "dotenv": "^16.0.1"
   }
 }
