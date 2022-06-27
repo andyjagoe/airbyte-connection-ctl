@@ -36,7 +36,11 @@ async function sendEvent(payload) {
         logGroupName: logGroupName,
         logStreamName: logStreamName
     };
-    const res = await cwlogs.putLogEvents(logParams).promise()
+    try {
+        const res = await cwlogs.putLogEvents(logParams).promise()
+    } catch (err) {
+        console.log(err)
+    }
     console.log(res)
 }
 
