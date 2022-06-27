@@ -27,7 +27,7 @@ async function sendEvent(payload) {
     await cwlogs.createLogStream(streamParams).promise()
 
     for (const attempt of payload?.attempts) {
-        attempt?.logs = ''
+        attempt["logs"] = ''
     }
 
     const logParams = {
