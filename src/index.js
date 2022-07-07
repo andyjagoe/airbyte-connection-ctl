@@ -86,7 +86,11 @@ async function main() {
     
         if (status?.data?.job?.status !== 'running') {
             jobRunning = false
-            sendEvent(status?.data)
+            try {
+                sendEvent(status?.data)
+            } catch (err) {
+                console.log(err)
+            }
             console.log(status?.data)
         }
         await sleep(1000)    
@@ -103,5 +107,8 @@ async function main() {
 
 main().catch((error) => {
   console.error(error)
+  shutdown(function(output){
+    console.log(output);
+  });
   process.exitCode = 1
 })
